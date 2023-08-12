@@ -12,7 +12,7 @@ Outfitter.cIgnoredQuickslotItems =
 function Outfitter.InitializeQuickSlots()
 	local vName = "OutfitterQuickSlots"
 	
-	Outfitter.QuickSlots = CreateFrame("Frame", vName, PaperDollFrame)
+	Outfitter.QuickSlots = CreateFrame("Frame", vName, AscensionPaperDollPanel)
 
 	Outfitter.InitializeFrame(Outfitter.QuickSlots, Outfitter._ButtonBar, Outfitter._QuickSlots)
 	Outfitter.QuickSlots:Construct(vName, 1, 1, Outfitter._QuickSlotButton, "OutfitterQuickSlotItemTemplate")
@@ -36,7 +36,7 @@ end
 
 function Outfitter._QuickSlots:HookPaperDollFrame()
 	for _, vSlotName in ipairs(Outfitter.cSlotNames) do
-		local vSlotButton = getglobal("Character"..vSlotName)
+		local vSlotButton = getglobal("AscensionCharacter"..vSlotName)
 		if vSlotButton then
 			Outfitter:HookScript(vSlotButton, "PreClick", Outfitter.PaperDollItemSlotButton_PreClick)
 			Outfitter:HookScript(vSlotButton, "PostClick", Outfitter.PaperDollItemSlotButton_PostClick)
