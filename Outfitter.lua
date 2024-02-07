@@ -1818,42 +1818,10 @@ function Outfitter:DeleteSelectedOutfit()
 	self:Update(true)
 end
 
--- called when a spec change is started to notify when it ends
-function Outfitter:SpecChangeStarted(event, eventType, specID)
-	if event == "COMMENTATOR_SKIRMISH_QUEUE_REQUEST" and eventType ~= "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" then return end
-	self.EventLib:RegisterEvent("CHAT_MSG_SYSTEM", self.TalentsChanged, self)
-end
-
 -- function called when we load in to the game world, and when we finish a respec
-function Outfitter:TalentsChanged(...)
-	local event, msg = ...
-	if event == "CHAT_MSG_SYSTEM" then 
-		if msg and msg:find("changed to Specialization (.*)%.") then 
-			self.EventLib:UnregisterEvent("CHAT_MSG_SYSTEM")
-		else
-			return
-		end
-	end
---	print("Can DW = "..tostring(CA_IsSpellKnown(46917)))
-	self.CanDualWield2H = CA_IsSpellKnown(46917) -- Ascension doesn't use the talent system.  Allow 2h dw outfits
---[[
-	if self.PlayerClass == "WARRIOR" then
-		local vNumTalents = GetNumTalents(2)
-		
-		for vTalentIndex = 1, vNumTalents do
-			local vTalentName, vIconPath, vTier, vColumn, vCurrentRank, vMaxRank, vIsExceptional, vMeetsPrereq = GetTalentInfo(2, vTalentIndex)
-			
-			if vIconPath == "Interface\\Icons\\Ability_Warrior_TitansGrip" then
-				--self:TestMessage("%s has %s points", vTalentName, vCurrentRank)
-				
-				self.CanDualWield2H = vCurrentRank == 1
-				break
-			end
-		end
-	else
-		self.CanDualWield2H = false
-	end
-	]]
+function Outfitter:TalentsChanged()
+	-- titans grip and hoplite
+	self.CanDualWield2H = C_CharacterAdvancement.IsKnownSpellID(46917) or MysticEnchantUtil.IsEnchantApplied("player", 978217)
 end
 
 function Outfitter:SetScript(pOutfit, pScript)
@@ -4057,7 +4025,7 @@ function Outfitter:ItemUsesBothWeaponSlots(pItem)
 		return false
 	end
 	
-	if pItem.InvType ~= "INVTYPE_2HWEAPON"then
+	if pItem.InvType ~= "INVTYPE_2HWEAPON" then
 		return false
 	end
 	
@@ -4075,7 +4043,12 @@ function Outfitter:ItemUsesBothWeaponSlots(pItem)
 	                        or pItem.SubType == Outfitter.LBI["Two-Handed Maces"]
 	                        or pItem.SubType == Outfitter.LBI["Two-Handed Swords"]
 							or pItem.SubType == Outfitter.LBI["Staves"] -- Ascension patch for dw stave+offhand
+							or pItem.SubType == Outfitter.LBI["Polearms"]
 	
+	local isHoplite = MysticEnchantUtil.IsEnchantApplied("player", 978217)
+	if isHoplite then
+		vIsDualWieldable2H = vIsDualWieldable2H or pItem.SubType == Outfitter.LBI["Shields"]
+	end
 	return not vIsDualWieldable2H
 end
 
@@ -5342,8 +5315,8 @@ function Outfitter:Initialize()
 	
 	self.EventLib:RegisterEvent("CHARACTER_POINTS_CHANGED", self.TalentsChanged, self)
 	self.EventLib:RegisterEvent("PLAYER_TALENT_UPDATE", self.TalentsChanged, self)
-
-	self.EventLib:RegisterEvent("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", self.SpecChangeStarted, self) -- ascension event for spec changes
+	self.EventLib:RegisterEvent("ASCENSION_KNOWN_ENTRIES_CHANGED", self.TalentsChanged, self)
+	self.EventLib:RegisterEvent("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", self.TalentsChanged, self)
 
 	self:TalentsChanged()
 	

@@ -666,9 +666,9 @@ equip = GetActiveTalentGroup() == 2
 		Name = "Specialization I",
 		ID = "Spec1",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization I")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization I")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 0 then
+if arg1 == 1 then
 	equip = true
 	delay = 5
 end
@@ -679,9 +679,9 @@ end
 		Name = "Specialization II",
 		ID = "Spec2",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization II")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization II")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 1 then
+if arg1 == 2 then
 	equip = true
 	delay = 5
 end
@@ -692,9 +692,9 @@ end
 		Name = "Specialization III",
 		ID = "Spec3",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization III")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization III")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 2 then
+if arg1 == 3 then
 	equip = true
 	delay = 5
 end
@@ -705,9 +705,9 @@ end
 		Name = "Specialization IV",
 		ID = "Spec4",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization IV")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization IV")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 3 then
+if arg1 == 4 then
 	equip = true
 	delay = 5
 end
@@ -718,9 +718,9 @@ end
 		Name = "Specialization V",
 		ID = "Spec5",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization V")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization V")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 4 then
+if arg1 == 5 then
 	equip = true
 	delay = 5
 end
@@ -731,9 +731,9 @@ end
 		Name = "Specialization VI",
 		ID = "Spec6",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization VI")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization VI")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 5 then
+if arg1 == 6 then
 	equip = true
 	delay = 5
 end
@@ -744,9 +744,9 @@ end
 		Name = "Specialization VII",
 		ID = "Spec7",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization VII")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization VII")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 6 then
+if arg1 == 7 then
 	equip = true
 	delay = 5
 end
@@ -757,9 +757,9 @@ end
 		Name = "Specialization VIII",
 		ID = "Spec8",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization VIII")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization VIII")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 7 then
+if arg1 == 8 then
 	equip = true
 	delay = 5
 end
@@ -770,9 +770,9 @@ end
 		Name = "Specialization IX",
 		ID = "Spec9",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization IX")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization IX")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 8 then
+if arg1 == 9 then
 	equip = true
 	delay = 5
 end
@@ -783,9 +783,9 @@ end
 		Name = "Specialization X",
 		ID = "Spec10",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization X")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization X")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 9 then
+if arg1 == 10 then
 	equip = true
 	delay = 5
 end
@@ -796,9 +796,9 @@ end
 		Name = "Specialization XI",
 		ID = "Spec11",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization XI")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization XI")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 10 then
+if arg1 == 11 then
 	equip = true
 	delay = 5
 end
@@ -809,9 +809,9 @@ end
 		Name = "Specialization XII",
 		ID = "Spec12",
 		Category = "SPEC",
-		Script = Outfitter:GenerateScriptHeader("COMMENTATOR_SKIRMISH_QUEUE_REQUEST", "Equips the outfit when you activate Specialization XII")..
+		Script = Outfitter:GenerateScriptHeader("ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED", "Equips the outfit when you activate Specialization XII")..
 [[
-if arg1 == "ASCENSION_CA_SPECIALIZATION_ACTIVE_ID_CHANGED" and arg2 == 11 then
+if arg1 == 12 then
 	equip = true
 	delay = 5
 end
