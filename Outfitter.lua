@@ -894,7 +894,6 @@ Outfitter.cSpecialIDEvents =
 
 	Dining = {Equip = "DINING", Unequip = "NOT_DINING"},
 	City = {Equip = "CITY", Unequip = "NOT_CITY"},
-	Riding = {Equip = "MOUNTED", Unequip = "NOT_MOUNTED"},
 	Swimming = {Equip = "SWIMMING", Unequip = "NOT_SWIMMING"},
 	Spirit = {Equip = "SPIRIT_REGEN", Unequip = "NOT_SPIRIT_REGEN"},
 	ArgentDawn = {Equip = "ARGENT_DAWN", Unequip = "NOT_ARGENT_DAWN"},
@@ -4627,8 +4626,6 @@ function Outfitter:UpdateSwimming()
 	
 	self.EventLib:DispatchEvent("TIMER")
 	
-	self:UpdateMountedState()
-	
 	local vSwimming = false
 	
 	if IsSwimming() then
@@ -4684,8 +4681,6 @@ function Outfitter:UpdateAuraStates()
 		self:SetSpecialOutfitEnabled(vSpecialID, vIsActive)
 	end
 	
-	self:UpdateMountedState()
-	
 	self:EndEquipmentUpdate()
 	
 	-- Update shapeshift state on aura change too
@@ -4695,12 +4690,6 @@ function Outfitter:UpdateAuraStates()
 	-- synch
 	
 	self.SchedulerLib:ScheduleUniqueTask(0.01, self.UpdateShapeshiftState, self)
-end
-
-function Outfitter:UpdateMountedState()
-	local vRiding = IsMounted() and not UnitOnTaxi("player")
-	
-	self:SetSpecialOutfitEnabled("Riding", vRiding)
 end
 
 function Outfitter:UpdateShapeshiftState()
@@ -5228,7 +5217,6 @@ function Outfitter:Initialize()
 	
 	-- Make sure the outfit state is good
 	
-	self:SetSpecialOutfitEnabled("Riding", false)
 	self:SetSpecialOutfitEnabled("Spirit", false)
 	self:UpdateAuraStates()
 	
@@ -5373,7 +5361,7 @@ end
 function Outfitter:InitializeSettings()
 	gOutfitter_Settings =
 	{
-		Version = 18,
+		Version = 19,
 		Options = {},
 		LastOutfitStack = {},
 		LayerIndex = {},
@@ -5584,17 +5572,6 @@ function Outfitter:InitializeSpecialOccasionOutfits()
 		Outfitter:AddOutfit(vOutfit)
 	end
 	]]--
-	-- Find riding items
-	
-	vOutfit = Outfitter:GetOutfitByScriptID("Riding")
-	
-	if not vOutfit then
-		vOutfit = Outfitter:GenerateSmartOutfit(Outfitter.cRidingOutfit, "MOUNT_SPEED", vInventoryCache, true)
-		vOutfit.ScriptID = "Riding"
-		vOutfit.ScriptSettings = {}
-		vOutfit.ScriptSettings.DisableBG = true -- Default to disabling in BGs since that appears to be the most popular
-		Outfitter:AddOutfit(vOutfit)
-	end
 	
 	-- Create the Battlegrounds outfits
 	
@@ -6844,18 +6821,6 @@ function Outfitter:CheckDatabase()
 		self.Settings.Version = 3
 	end
 	
-	-- Version 4 sets the BGDisabled flag for the mounted outfit
-	
-	if self.Settings.Version < 4 then
-		local vRidingOutfit = self:GetOutfitByScriptID("Riding")
-		
-		if vRidingOutfit then
-			vRidingOutfit.BGDisabled = true
-		end
-		
-		self.Settings.Version = 4
-	end
-	
 	-- Version 5 adds moonkin form, just reinitialize class outfits
 
 	if self.Settings.Version < 5 then
@@ -6993,29 +6958,6 @@ function Outfitter:CheckDatabase()
 		self.Settings.Version = 11
 	end
 	
-	-- Version 12 moves the BGDisabled, AQDisabled and NaxxDisabled flags to
-	-- the script settings for the riding outfiZt
-	
-	if self.Settings.Version < 12 then
-		local vRidingOutfit = self:GetOutfitByScriptID("Riding")
-		
-		if vRidingOutfit then
-			if not vRidingOutfit.ScriptSettings then
-				vRidingOutfit.ScriptSettings = {}
-			end
-			
-			vRidingOutfit.ScriptSettings.DisableAQ40 = vRidingOutfit.AQDisabled
-			vRidingOutfit.ScriptSettings.DisableBG = vRidingOutfit.BGDisabled
-			vRidingOutfit.ScriptSettings.DisableNaxx = vRidingOutfit.NaxxDisabled
-			
-			vRidingOutfit.AQDisabled = nil
-			vRidingOutfit.BGDisabled = nil
-			vRidingOutfit.NaxxDisabled = nil
-		end
-		
-		self.Settings.Version = 12
-	end
-	
 	-- Version 13 adds the LayerIndex table
 	
 	if self.Settings.Version < 13 then
@@ -7071,6 +7013,14 @@ function Outfitter:CheckDatabase()
 		end
 		
 		self.Settings.Version = 18
+	end
+
+	if self.Settings.Version < 19 then
+		local vRidingOutfit = self:GetOutfitByScriptID("Riding")
+		if vRidingOutfit then
+			self:DeleteOutfit(vRidingOutfit)
+		end
+		self.Settings.Version = 19
 	end
 	
 	-- Repair missing settings

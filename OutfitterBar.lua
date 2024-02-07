@@ -12,7 +12,6 @@ Outfitter.OutfitBar.cWildcardIcon = Outfitter.OutfitBar.cBlizzardIconPath..Outfi
 Outfitter.OutfitBar.cDefaultScriptIcons =
 {
 	ArgentDawn = "INV_Jewelry_Talisman_07",
-	Riding = "Ability_Mount_RidingHorse",
 	Fishing = "Trade_Fishing",
 	Swimming = "Spell_Shadow_DemonBreath",
 	City = "INV_Shirt_Black_01",

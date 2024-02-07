@@ -32,7 +32,6 @@
 		* In zone/city
 		* Resting
 		
-		* Mounted
 		* Falling
 		* Swimming
 		* Fishing
@@ -814,70 +813,6 @@ end
 if arg1 == 12 then
 	equip = true
 	delay = 5
-end
-]],
-	},
-	{
-		Name = Outfitter.cRidingOutfit,
-		ID = "Riding",
-		Category = "TRADE",
-		Script = Outfitter:GenerateScriptHeader("MOUNTED NOT_MOUNTED", Outfitter.cRidingOutfitDescription)..
-[[
--- $SETTING DisableBG={type="boolean", label="Don't equip in Battlegrounds", default=true}
--- $SETTING DisableInstance={type="boolean", label="Don't equip in dungeons", default=true}
--- $SETTING DisablePVP={type="boolean", label="Don't equip while PvP flagged", default=false}
--- $SETTING StayEquippedWhileFalling={type="boolean", label="Leave equipped while falling", default=false}
--- $SETTING UnequipDelay={type="number", label="Wait", suffix="seconds before unequipping", default=0}
-
--- Equip on mount unless it's disabled
-
-if event == "MOUNTED" then
-	-- The disable options are only checked inside the mounting handler.  This way
-	-- the outfit won't equip automatically, but if the player chooses to
-	-- manually equip it after mounting, then Outfitter will still unequip
-	-- it for them when they dismount
-
-	local inInstance, instanceType = IsInInstance()
-
-	if (setting.DisableInstance and inInstance and (instanceType == "raid" or instanceType == "party"))
-	or (setting.DisableBG and Outfitter:InBattlegroundZone())
-	or (setting.DisablePVP and UnitIsPVP("player")) then
-		return
-	end
-
-	equip = true
-
--- Unequip on dismount
-
-elseif event == "NOT_MOUNTED" then
-	if not setting.StayEquippedWhileFalling then
-		equip = false
-	else
-		self.UnequipWhenNotFalling = true
-		self.DismountTime = GetTime()
-		self:RegisterEvent("TIMER")
-	end
-
-	if setting.UnequipDelay then
-		delay = setting.UnequipDelay
-	end
-
--- Check to see if the player is no longer falling
-
-elseif event == "TIMER" then
-
-	-- Unequip if the player was falling when dismounted and has now landed
-
-	if self.UnequipWhenNotFalling
-	and GetTime() >= self.DismountTime + 1
-	and not IsFalling() then
-		equip = false
-		self.UnequipWhenNotFalling = nil
-	end
-
-	if not self.UnequipWhenNotFalling then
-		self:UnregisterEvent("TIMER")
-	end
 end
 ]],
 	},
