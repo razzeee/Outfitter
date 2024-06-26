@@ -1820,7 +1820,7 @@ end
 -- function called when we load in to the game world, and when we finish a respec
 function Outfitter:TalentsChanged()
 	-- titans grip and hoplite
-	self.CanDualWield2H = C_CharacterAdvancement.IsKnownSpellID(46917) or MysticEnchantUtil.IsEnchantApplied("player", 978217)
+	self.CanDualWield2H = C_CharacterAdvancement.IsKnownSpellID(46917) or MysticEnchantUtil.IsEnchantApplied("player", 978217) or C_CharacterAdvancement.IsKnownSpellID(274267)
 end
 
 function Outfitter:SetScript(pOutfit, pScript)
