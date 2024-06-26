@@ -131,8 +131,8 @@ function Outfitter.MinimapButton_ItemSelected(pMenu, pValue)
 		if vDoToggle then
 			return true
 		end
-	--elseif pValue == 0 then -- Open Outfitter
-	--	Outfitter:OpenUI() -- This breaks the Escape keybind for opening Game menu for some reason. Could not fix so disabled. Access outfitter from paper doll frame.
+	elseif pValue == 0 then -- Open Outfitter
+		Outfitter:OpenUI()
 	elseif pValue == -1 then -- Change AutoSwitch Value.
 		Outfitter:SetAutoSwitch(gOutfitter_Settings.Options.DisableAutoSwitch)
 		return true
