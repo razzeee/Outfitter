@@ -1,4 +1,5 @@
-﻿Outfitter.cVersion = "5.1"
+local version = GetAddOnMetadata("Outfitter", "Version")
+Outfitter.cVersion = version
 
 Outfitter.cTitle = "Outfitter"
 Outfitter.cTitleVersion = Outfitter.cTitle.." "..Outfitter.cVersion
