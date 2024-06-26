@@ -6771,7 +6771,7 @@ function Outfitter:ToggleUI(pToggleCharWindow)
 		OutfitterFrame:Hide()
 		
 		if pToggleCharWindow then
-			HideUIPanel(CharacterFrame)
+			HideUIPanel(AscensionCharacterFrame)
 		end
 	else
 		self:OpenUI()
@@ -6779,8 +6779,8 @@ function Outfitter:ToggleUI(pToggleCharWindow)
 end
 
 function Outfitter:OpenUI()
-	ShowUIPanel(CharacterFrame)
-	CharacterFrame_ShowSubFrame("PaperDollFrame")
+	ShowUIPanel(AscensionCharacterFrame)
+	CharacterFrame_ShowSubFrame("PaperDollFrame") -- Should this be "AscensionPaperDollPanel"? Regardless it works even if this line is commented out.
 	OutfitterFrame:Show()
 end
 
