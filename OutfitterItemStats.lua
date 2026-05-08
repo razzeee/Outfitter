@@ -886,3 +886,196 @@ function Outfitter.TankPoints_Test()
 	Outfitter:TestMessage("TankPoints = "..vTankPoints)
 end
 
+----------------------------------------
+-- PvP / PvE Power stats
+-- LibStatLogic has no knowledge of these Ascension-custom stats, so we
+-- scan the item tooltip directly for the stat line and parse the number.
+----------------------------------------
+
+Outfitter._TooltipPowerStat = {}
+Outfitter._TooltipPowerStatMetaTable = {__index = Outfitter._TooltipPowerStat}
+
+-- Per-session tooltip scan cache: link -> value (or false if tooltip failed to load).
+-- Cleared when a new optimize run begins via Begin().
+Outfitter._TooltipPowerStat._Cache = {}
+
+-- Complex = true forces the genetic optimizer path, which calls Begin/End and
+-- pre-warms the tooltip cache before scoring begins.
+Outfitter._TooltipPowerStat.Complex = true
+
+function Outfitter._TooltipPowerStat:Begin(pInventoryCache)
+	self._Cache = {}
+	local vFound = 0
+	local vTotal = 0
+
+	for _, vItems in pairs(pInventoryCache.ItemsBySlot) do
+		for _, vItem in ipairs(vItems) do
+			if vItem.Link and self._Cache[vItem.Link] == nil then
+				local vScore = self:_ScanTooltip(vItem.Link)
+				self._Cache[vItem.Link] = vScore
+				vTotal = vTotal + 1
+				if vScore and vScore > 0 then
+					vFound = vFound + 1
+					Outfitter:NoteMessage("[PowerStat] %s: %s = %s", self.SearchPattern, tostring(vItem.Name), tostring(vScore))
+				end
+			end
+		end
+	end
+
+	Outfitter:NoteMessage("[PowerStat] %s: scanned %d items, %d have the stat", self.SearchPattern, vTotal, vFound)
+end
+
+function Outfitter._TooltipPowerStat:End(pInventoryCache)
+	self._Cache = {}
+end
+
+-- Scan the tooltip for self.SearchPattern, returning the integer value found,
+-- or 0 if the stat isn't on the item, or nil if the tooltip couldn't be loaded.
+function Outfitter._TooltipPowerStat:_ScanTooltip(pItemLink)
+	if not pItemLink then
+		return nil
+	end
+
+	OutfitterTooltip:SetOwner(OutfitterFrame, "ANCHOR_BOTTOMRIGHT", 0, 0)
+
+	if not OutfitterTooltip:SetHyperlink(pItemLink) then
+		OutfitterTooltip:Hide()
+		Outfitter:NoteMessage("[PowerStat] SetHyperlink failed for: %s", tostring(pItemLink))
+		return nil  -- item not in client cache yet
+	end
+
+	local vValue = 0
+
+	for vLineIndex = 1, 30 do
+		local vFrame = _G["OutfitterTooltipTextLeft"..vLineIndex]
+
+		if not vFrame then
+			break
+		end
+
+		local vText = vFrame:GetText()
+
+		if vText and vText:find(self.SearchPattern, nil, true) then
+			-- Match the first number on the line (handles integers and decimals).
+			-- Multiply by 100 and floor so decimal values (e.g. 0.5) become
+			-- integers (50) and comparisons stay exact.
+			local vRaw = tonumber(vText:match("([%d%.]+)")) or 0
+			vValue = math.floor(vRaw * 100)
+			break
+		end
+	end
+
+	OutfitterTooltip:Hide()
+	return vValue
+end
+
+function Outfitter._TooltipPowerStat:_GetCachedScore(pItemLink)
+	local vCached = self._Cache[pItemLink]
+
+	if vCached ~= nil then
+		return vCached  -- 0 = confirmed absent, >0 = has the stat, nil = tooltip failed
+	end
+
+	-- Not pre-warmed (e.g. called outside an optimize run): scan now and cache.
+	local vValue = self:_ScanTooltip(pItemLink)
+	self._Cache[pItemLink] = vValue
+	return vValue
+end
+
+function Outfitter._TooltipPowerStat:GetItemScore(pItem)
+	local vScore = self:_GetCachedScore(pItem and pItem.Link)
+
+	-- nil means tooltip couldn't load; treat as 0 (neutral) so the item is
+	-- still eligible for slots.  0 means confirmed no stat.  Both cases return
+	-- 0 here so every item participates and slots are always filled — items that
+	-- actually have the stat win their slots by scoring higher.
+	return vScore or 0
+end
+
+-- "No PvP Power": every equippable item gets a score.
+-- Items without PvP Power score 1 (all tie, any will do).
+-- Items with PvP Power score -(value * 1000) and lose every slot comparison.
+-- Uses its own independent cache so it doesn't share state with PvP/PvE Power.
+
+Outfitter._NoPvpPowerStat = {}
+Outfitter._NoPvpPowerStatMetaTable = {__index = Outfitter._NoPvpPowerStat}
+
+Outfitter._NoPvpPowerStat.SearchPattern = "PvP Power"
+Outfitter._NoPvpPowerStat._Cache = {}
+Outfitter._NoPvpPowerStat.Complex = true
+
+function Outfitter._NoPvpPowerStat:Begin(pInventoryCache)
+	self._Cache = {}
+	for _, vItems in pairs(pInventoryCache.ItemsBySlot) do
+		for _, vItem in ipairs(vItems) do
+			if vItem.Link and self._Cache[vItem.Link] == nil then
+				self._Cache[vItem.Link] = Outfitter._TooltipPowerStat._ScanTooltip(self, vItem.Link)
+			end
+		end
+	end
+end
+
+function Outfitter._NoPvpPowerStat:End(pInventoryCache)
+	self._Cache = {}
+end
+
+function Outfitter._NoPvpPowerStat:GetItemScore(pItem)
+	local vLink = pItem and pItem.Link
+	local vCached = self._Cache[vLink]
+
+	local vPvpPower
+	if vCached ~= nil then
+		vPvpPower = vCached
+	else
+		vPvpPower = Outfitter._TooltipPowerStat._ScanTooltip(self, vLink)
+		self._Cache[vLink] = vPvpPower
+	end
+
+	if vPvpPower and vPvpPower > 0 then
+		return -vPvpPower * 1000
+	end
+
+	-- No PvP Power (or tooltip unavailable): score 1 so item is always included.
+	return 1
+end
+
+-- Build and register the category
+
+local vAscensionPowerCategory =
+{
+	CategoryID = "AscensionPower",
+	Name = "PvP / PvE",
+	Stats =
+	{
+		{
+			ID            = "PVE_POWER",
+			Name          = "PvE Power",
+			SearchPattern = "PvE Power",
+		},
+		{
+			ID            = "PVP_POWER",
+			Name          = "PvP Power",
+			SearchPattern = "PvP Power",
+		},
+		{
+			ID            = "NO_PVP_POWER",
+			Name          = "No PvP Power",
+		},
+	},
+}
+
+-- Wire up metatables
+for _, vStat in ipairs(vAscensionPowerCategory.Stats) do
+	if vStat.ID == "NO_PVP_POWER" then
+		setmetatable(vStat, Outfitter._NoPvpPowerStatMetaTable)
+	else
+		setmetatable(vStat, Outfitter._TooltipPowerStatMetaTable)
+	end
+end
+
+-- Category accessors
+vAscensionPowerCategory.GetNumStats     = function(self) return #self.Stats end
+vAscensionPowerCategory.GetIndexedStat  = function(self, pIndex) return self.Stats[pIndex] end
+
+table.insert(Outfitter.StatCategories, vAscensionPowerCategory)
+

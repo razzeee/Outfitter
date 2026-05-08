@@ -474,11 +474,11 @@ Outfitter.BANKED_FONT_COLOR_CODE = "|cff4033ff"
 Outfitter.OUTFIT_MESSAGE_COLOR = {r = 0.2, g = 0.75, b = 0.3}
 
 Outfitter.IsWoW4 = UnitGetIncomingHeals ~= nil
-if Outfitter.IsWoW4 then
-	Outfitter.cItemLinkFormat = "|Hitem:(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+)|h%[([^%]]*)%]|h"
-else
-	Outfitter.cItemLinkFormat = "|Hitem:(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+)|h%[([^%]]*)%]|h"
-end
+
+-- Flexible item link format: captures item ID, enchant, 4 jewel codes, subcode, uniqueID
+-- then skips any additional fields (varies by server/client version) before the item name.
+-- Standard WotLK 3.3.5a links have 8 fields; some servers add extra fields.
+Outfitter.cItemLinkFormat = "|Hitem:(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+):(-?%d+)[^|]*|h%[([^%]]*)%]|h"
 
 
 Outfitter.cUniqueGemEnchantIDs =
@@ -1153,6 +1153,26 @@ function Outfitter:OnShow()
 	self.SetFrameLevel(OutfitterFrame, PaperDollFrame:GetFrameLevel() - 1)
 	
 	self:ShowPanel(1) -- Always switch to the main view when showing the window
+end
+
+-- Hide the Outfitter button when non-paperdoll tabs are shown (e.g. Talents, Skills, Reputation)
+if AscensionPaperDollPanel then
+	AscensionPaperDollPanel:HookScript("OnShow", function()
+		OutfitterButtonFrame:Show()
+	end)
+	AscensionPaperDollPanel:HookScript("OnHide", function()
+		OutfitterButtonFrame:Hide()
+	end)
+	-- Sync on character window open in case a non-paperdoll tab was last active
+	if AscensionCharacterFrame then
+		AscensionCharacterFrame:HookScript("OnShow", function()
+			if AscensionPaperDollPanel:IsShown() then
+				OutfitterButtonFrame:Show()
+			else
+				OutfitterButtonFrame:Hide()
+			end
+		end)
+	end
 end
 
 function Outfitter:OnHide()
