@@ -194,6 +194,38 @@ end
 function Outfitter:QuickSlotItemButton_OnUpdate()
 end
 
+function Outfitter._QuickSlots:OnQuickSlotItemPreClick(pButton)
+	local vSlotName = self.SlotName
+	
+	if not vSlotName then
+		return
+	end
+	
+	local vBagIndex = pButton:GetParent():GetID()
+	local vBagSlotIndex = pButton:GetID()
+	local vItemInfo = Outfitter:GetBagItemInfo(vBagIndex, vBagSlotIndex)
+	
+	if not vItemInfo or vItemInfo.Code == 0 then
+		return
+	end
+	
+	-- If a slot-specific outfit is selected, update it directly so the
+	-- IsUnknown guard in AddNewItems doesn't swallow the change.
+	-- Skip EM outfits as they manage their own persistence.
+	
+	if Outfitter.SelectedOutfit and not Outfitter.SelectedOutfit.StoredInEM then
+		Outfitter.SelectedOutfit:AddItem(vSlotName, vItemInfo)
+		
+		local vCheckbox = _G["OutfitterEnable"..vSlotName]
+		
+		if vCheckbox then
+			vCheckbox.IsUnknown = false
+		end
+		
+		Outfitter:OutfitSettingsChanged(Outfitter.SelectedOutfit)
+	end
+end
+
 ----------------------------------------
 -- Outfitter._QuickSlotButton
 ----------------------------------------
@@ -203,6 +235,10 @@ function Outfitter._QuickSlotButton:Construct()
 	self.ItemButton = getglobal(self:GetName().."Item1")
 	
 	Outfitter.SetFrameLevel(self, Outfitter.QuickSlots:GetFrameLevel() + 1)
+	
+	self.ItemButton:HookScript("PreClick", function(btn)
+		Outfitter.QuickSlots:OnQuickSlotItemPreClick(btn)
+	end)
 end
 
 function Outfitter._QuickSlotButton:OnShow()
