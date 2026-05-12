@@ -49,7 +49,7 @@ function Outfitter._QuickSlots:HookPaperDollFrame()
 end
 
 function Outfitter._QuickSlots:Open(pSlotName, pHoveringOpen)
-	local	vPaperDollSlotName = "Character"..pSlotName
+	local	vPaperDollSlotName = "AscensionCharacter"..pSlotName
 	
 	-- Hide the tooltip so that it isn't in the way
 	
