@@ -4,6 +4,7 @@
 ## Title: Outfitter
 ## Version: 5.2
 ## Notes: Clothing and weapon management and automated equipment changes
+## X-Source: https://github.com/razzeee/Outfitter
 ## OptionalDeps: Titan, FuBar, TankPoints, ButtonFacade
 ## RequiredDeps: 
 ## SavedVariablesPerCharacter: gOutfitter_Settings
