@@ -96,7 +96,11 @@ function Addon.DebugLib:AddDebugMessage(pPrefix, pMessage, ...)
 			if type(select(1, ...)) == "table" then
 				vMessage = string.gsub(vMessage, "%$(%w+)", ...)
 			else
-				vMessage = string.format(vMessage, ...)
+				local vSucceeded
+				vSucceeded, vMessage = pcall(string.format, vMessage, ...)
+				if not vSucceeded then
+					vMessage = pMessage
+				end
 			end
 		end
 	else
